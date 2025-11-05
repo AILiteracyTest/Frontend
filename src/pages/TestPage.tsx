@@ -4,7 +4,7 @@ import ProgressBar from "../components/ProgressBar";
 import { useState, useEffect, useRef } from "react";
 import GrayCard from "../components/GrayCard";
 import { useNavigate } from "react-router-dom";
-import { fetchImagePair } from "../api/imageApi";
+import { fetchImagePair, fetchImageExplanation } from "../api/imageApi";
 
 export default function TestPage() {
   const totalQuestions = 3;
@@ -17,6 +17,7 @@ export default function TestPage() {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [answerResult, setAnswerResult] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
 
   const [imagePair, setImagePair] = useState<{
     ai: string;
@@ -57,13 +58,23 @@ export default function TestPage() {
     loadImages();
   }, [currentQuestion]);
 
-  const handleImageClick = (index: number) => {
+  const handleImageClick = async (index: number) => {
     if (selectedImage !== null) return;
     setSelectedImage(index);
     setShowExplanation(true);
     const isCorrect = shuffledImages[index].type === "ai";
     setAnswerResult(isCorrect ? "정답입니다!" : "틀렸습니다.");
     if (isCorrect) setCorrectCount((prev) => prev + 1);
+
+    if (imagePair?.runId) {
+      try {
+        const explanationText = await fetchImageExplanation(imagePair.runId);
+        setExplanation(explanationText);
+      } catch (err) {
+        console.error(err);
+        setExplanation("해설을 불러오는 중 오류가 발생했습니다.");
+      }
+    }
   };
 
   const handleNext = () => {
@@ -130,6 +141,11 @@ export default function TestPage() {
               >
                 {answerResult}
               </p>
+              {explanation && (
+                <p className="text-gray-700 mt-2 whitespace-pre-line">
+                  {explanation}
+                </p>
+              )}
             </GrayCard>
           )}
 
