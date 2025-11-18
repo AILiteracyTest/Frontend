@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import WhiteCard from "../components/WhiteCard";
 import GrayCard from "../components/GrayCard";
 import Button from "../components/Button";
+import FontToggle from "../components/FontToggle";
 export default function ResultPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,24 +22,25 @@ export default function ResultPage() {
       }
     } else {
       try {
+        console.log("메인 페이지 URL이 복사되었습니다!");
         await navigator.clipboard.writeText(mainPageUrl);
-        alert("메인 페이지 URL이 복사되었습니다!");
       } catch {
-        alert("복사 실패, 수동으로 공유해주세요.");
+        console.error("복사 실패, 수동으로 공유해주세요.");
       }
     }
   };
 
   return (
     <div className="bg-app-bg flex items-center justify-center min-h-screen p-4 w-screen">
+      <FontToggle className="absolute top-4 right-10" />
       <WhiteCard>
         <div className="text-center space-y-8">
-          <h1 className="text-3xl font-bold mb-4 mt-4">테스트 결과</h1>
-          <p className="text-xl text-gray-600 font-bold">
+          <h1 className="font-bold mb-4 mt-4">테스트 결과</h1>
+          <p className="text-gray-600 font-bold">
             AI 리터러시 테스트를 완료하셨습니다.
           </p>
-          <GrayCard className="text-xl font-bold p-6 shadow-md border-b-4 border-gray-300">
-            <p className="text-xl font-bold text-gray-800 mb-2">
+          <GrayCard className="font-bold p-6 shadow-md border-b-4 border-gray-300">
+            <p className="font-bold text-gray-800 mb-2">
               총{" "}
               <span className="font-extrabold text-2xl">
                 {totalQuestions}개
