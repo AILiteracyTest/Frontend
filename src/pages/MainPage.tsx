@@ -17,7 +17,7 @@ export default function MainPage() {
           alt="ai 리터러시 테스트"
           className="w-32 h-32 mx-auto"
         />
-        <h1 className="font-bold mb-12 mt-4">AI 리터러시 테스트</h1>
+        <h1 className="font-bold mb-12 mt-4 text-black">AI 리터러시 테스트</h1>
         <Button onClick={() => navigate("test")}>시작하기</Button>
       </WhiteCard>
     </div>

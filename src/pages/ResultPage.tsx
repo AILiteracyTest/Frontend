@@ -35,7 +35,7 @@ export default function ResultPage() {
       <FontToggle className="absolute top-4 right-10" />
       <WhiteCard>
         <div className="text-center space-y-8">
-          <h1 className="font-bold mb-4 mt-4">테스트 결과</h1>
+          <h1 className="font-bold mb-4 mt-4 text-black">테스트 결과</h1>
           <p className="text-gray-600 font-bold">
             AI 리터러시 테스트를 완료하셨습니다.
           </p>
@@ -53,11 +53,11 @@ export default function ResultPage() {
             </p>
           </GrayCard>
           <div className="flex gap-8 mb-6 mt-8">
-            <GrayCard className=" h-40 w-1/2 rounded-md flex items-center justify-center">
+            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex items-center justify-center">
               {" "}
               그래프
             </GrayCard>
-            <GrayCard className=" h-40 w-1/2 rounded-md flex items-center justify-center">
+            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex items-center justify-center">
               n명 중 n위
             </GrayCard>
           </div>
