@@ -28,8 +28,8 @@ export const fetchImageExplanation = async (runId: string) => {
     `https://aivideocheckservice.onrender.com/image_analysis?mode=ans&run_id=${runId}`
   );
   if (!res.ok) throw new Error("해설 불러오기 실패");
+
   const data = await res.json();
 
-  // 백엔드에서 해설이 들어오는 필드명이 정해져 있지 않다면 이렇게 안전하게 처리
-  return data.analysis || data.reason || "해설 정보를 불러올 수 없습니다.";
+  return data?.synthetic?.explanation ?? "해설 정보를 불러올 수 없습니다.";
 };

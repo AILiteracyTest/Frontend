@@ -7,6 +7,15 @@ import { useNavigate } from "react-router-dom";
 import { fetchImagePair, fetchImageExplanation } from "../api/imageApi";
 import FontToggle from "../components/FontToggle";
 
+type QuestionResult = {
+  questionIndex: number;
+  realImage: string;
+  aiImage: string;
+  selectedType: "ai" | "real";
+  isCorrect: boolean;
+  explanation: string;
+};
+
 export default function TestPage() {
   const totalQuestions = 3;
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -19,6 +28,7 @@ export default function TestPage() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [answerResult, setAnswerResult] = useState<string | null>(null);
   const [explanation, setExplanation] = useState<string | null>(null);
+  const [results, setResults] = useState<QuestionResult[]>([]);
 
   const [imagePair, setImagePair] = useState<{
     ai: string;
@@ -61,9 +71,13 @@ export default function TestPage() {
 
   const handleImageClick = async (index: number) => {
     if (selectedImage !== null) return;
+
     setSelectedImage(index);
     setShowExplanation(true);
-    const isCorrect = shuffledImages[index].type === "ai";
+
+    const selectedType = shuffledImages[index].type;
+    const isCorrect = selectedType === "ai";
+
     setAnswerResult(isCorrect ? "정답입니다!" : "틀렸습니다.");
     if (isCorrect) setCorrectCount((prev) => prev + 1);
 
@@ -71,6 +85,18 @@ export default function TestPage() {
       try {
         const explanationText = await fetchImageExplanation(imagePair.runId);
         setExplanation(explanationText);
+
+        setResults((prev) => [
+          ...prev,
+          {
+            questionIndex: currentQuestion + 1,
+            realImage: imagePair.real,
+            aiImage: imagePair.ai,
+            selectedType,
+            isCorrect,
+            explanation: explanationText,
+          },
+        ]);
       } catch (err) {
         console.error(err);
         setExplanation("해설을 불러오는 중 오류가 발생했습니다.");
@@ -83,7 +109,9 @@ export default function TestPage() {
     setShowExplanation(false);
     setAnswerResult(null);
     if (currentQuestion + 1 === totalQuestions) {
-      navigate("/result", { state: { correctCount, totalQuestions } });
+      navigate("/result", {
+        state: { correctCount, totalQuestions, results },
+      });
     } else {
       setCurrentQuestion((prev) => prev + 1);
     }

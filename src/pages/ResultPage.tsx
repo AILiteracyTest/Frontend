@@ -3,10 +3,28 @@ import WhiteCard from "../components/WhiteCard";
 import GrayCard from "../components/GrayCard";
 import Button from "../components/Button";
 import FontToggle from "../components/FontToggle";
+
+type QuestionResult = {
+  questionIndex: number;
+  realImage: string;
+  aiImage: string;
+  selectedType: "ai" | "real";
+  isCorrect: boolean;
+  explanation: string;
+};
+
 export default function ResultPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { correctCount = 0, totalQuestions = 0 } = location.state || {};
+  const {
+    correctCount = 0,
+    totalQuestions = 0,
+    results = [],
+  }: {
+    correctCount: number;
+    totalQuestions: number;
+    results: QuestionResult[];
+  } = location.state || {};
 
   const handleShare = async () => {
     const mainPageUrl = window.location.origin; // 메인 페이지 URL
@@ -52,14 +70,73 @@ export default function ResultPage() {
               정답!
             </p>
           </GrayCard>
-          <div className="flex gap-8 mb-6 mt-8">
+          <div className="flex gap-8 mb-6 mt-6">
             <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex items-center justify-center">
-              {" "}
               그래프
             </GrayCard>
             <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex items-center justify-center">
               n명 중 n위
             </GrayCard>
+          </div>
+          <h2 className="font-bold text-black mt-12 leading-tight">
+            문제별 결과 해설
+          </h2>
+          <div className="mt-6 text-left space-y-10">
+            {results.length === 0 ? (
+              <p className="text-gray-500">저장된 결과가 없습니다.</p>
+            ) : (
+              results.map((item) => (
+                <div
+                  key={item.questionIndex}
+                  className="border rounded-lg p-4 bg-white"
+                >
+                  <p className="font-semibold mb-2 text-black">
+                    문제 {item.questionIndex} ·{" "}
+                    <span
+                      className={
+                        item.isCorrect ? "text-blue-600" : "text-red-600"
+                      }
+                    >
+                      {item.isCorrect ? "정답" : "오답"}
+                    </span>
+                  </p>
+
+                  <div className="flex gap-4 mb-3">
+                    <div
+                      className={`w-1/2 border-2 rounded ${
+                        item.selectedType === "real"
+                          ? "border-blue-500"
+                          : "border-gray-200"
+                      }`}
+                    >
+                      <img
+                        src={item.realImage}
+                        alt="real"
+                        className="w-full h-72 object-cover rounded block"
+                      />
+                    </div>
+
+                    <div
+                      className={`w-1/2 border-2 rounded ${
+                        item.selectedType === "ai"
+                          ? "border-blue-500"
+                          : "border-red-500"
+                      }`}
+                    >
+                      <img
+                        src={item.aiImage}
+                        alt="ai"
+                        className="w-full h-72 object-cover rounded block"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                    {item.explanation}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
           <div className="flex flex-col gap-3 items-center justify-center">
             <Button onClick={handleShare}>친구에게 공유하기</Button>
