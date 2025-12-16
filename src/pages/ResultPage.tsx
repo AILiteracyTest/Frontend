@@ -20,10 +20,16 @@ export default function ResultPage() {
     correctCount = 0,
     totalQuestions = 0,
     results = [],
+    scoreStats,
   }: {
     correctCount: number;
     totalQuestions: number;
     results: QuestionResult[];
+    scoreStats?: {
+      rank: number;
+      total: number;
+      percentile: number;
+    };
   } = location.state || {};
 
   const handleShare = async () => {
@@ -55,7 +61,8 @@ export default function ResultPage() {
         <div className="text-center space-y-8">
           <h1 className="font-bold mb-4 mt-4 text-black">테스트 결과</h1>
           <p className="text-gray-600 font-bold">
-            AI 리터러시 테스트를 완료하셨습니다.
+            AI 리터러시 테스트를 완료하셨습니다. 아래에서 전체 결과를
+            확인하세요.
           </p>
           <GrayCard className="font-bold p-6 shadow-md border-b-4 border-gray-300">
             <p className="font-bold text-gray-800 mb-2">
@@ -71,11 +78,20 @@ export default function ResultPage() {
             </p>
           </GrayCard>
           <div className="flex gap-8 mb-6 mt-6">
-            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex items-center justify-center">
-              그래프
+            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex flex-col items-center justify-center">
+              <p className="font-bold text-black mb-2">백분위</p>
+              <p className="text-3xl font-extrabold text-blue-600">
+                {scoreStats ? `${scoreStats.percentile}%` : "-"}
+              </p>
             </GrayCard>
-            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex items-center justify-center">
-              n명 중 n위
+
+            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex flex-col items-center justify-center">
+              <p className="font-bold text-black mb-2">전체 순위</p>
+              <p className="text-2xl font-extrabold">
+                {scoreStats
+                  ? `${scoreStats.total}명 중 ${scoreStats.rank}위`
+                  : "-"}
+              </p>
             </GrayCard>
           </div>
           <h2 className="font-bold text-black mt-12 leading-tight">

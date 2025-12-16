@@ -6,6 +6,7 @@ import GrayCard from "../components/GrayCard";
 import { useNavigate } from "react-router-dom";
 import { fetchImagePair, fetchImageExplanation } from "../api/imageApi";
 import FontToggle from "../components/FontToggle";
+import { postScore } from "../api/scoreApi";
 
 type QuestionResult = {
   questionIndex: number;
@@ -104,14 +105,29 @@ export default function TestPage() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setSelectedImage(null);
     setShowExplanation(false);
     setAnswerResult(null);
+
     if (currentQuestion + 1 === totalQuestions) {
-      navigate("/result", {
-        state: { correctCount, totalQuestions, results },
-      });
+      try {
+        const scoreStats = await postScore(correctCount);
+
+        navigate("/result", {
+          state: {
+            correctCount,
+            totalQuestions,
+            results,
+            scoreStats,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+        navigate("/result", {
+          state: { correctCount, totalQuestions, results },
+        });
+      }
     } else {
       setCurrentQuestion((prev) => prev + 1);
     }
