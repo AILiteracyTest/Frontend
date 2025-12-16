@@ -4,9 +4,11 @@ import ProgressBar from "../components/ProgressBar";
 import { useState, useEffect, useRef } from "react";
 import GrayCard from "../components/GrayCard";
 import { useNavigate } from "react-router-dom";
-import { fetchImagePair, fetchImageExplanation } from "../api/imageApi";
 import FontToggle from "../components/FontToggle";
 import { postScore } from "../api/scoreApi";
+import { fetchDatasetImage } from "../api/imageApi";
+
+const BASE_URL = "https://aivideocheckservice.onrender.com";
 
 type QuestionResult = {
   questionIndex: number;
@@ -34,7 +36,8 @@ export default function TestPage() {
   const [imagePair, setImagePair] = useState<{
     ai: string;
     real: string;
-    runId: string;
+    explanation: string;
+    sampleId: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [shuffledImages, setShuffledImages] = useState<
@@ -51,11 +54,17 @@ export default function TestPage() {
       setLoading(true);
       setShuffledImages([]);
       try {
-        const data = await fetchImagePair();
-        setImagePair(data);
+        const data = await fetchDatasetImage();
+        setImagePair({
+          ai: `${BASE_URL}${data.fake_url}`,
+          real: `${BASE_URL}${data.real_url}`,
+          explanation: data.explanation,
+          sampleId: data.sample_id,
+        });
+
         const list: { url: string; type: "ai" | "real" }[] = [
-          { url: data.ai, type: "ai" },
-          { url: data.real, type: "real" },
+          { url: `${BASE_URL}${data.fake_url}`, type: "ai" },
+          { url: `${BASE_URL}${data.real_url}`, type: "real" },
         ];
         const randomized = [...list].sort(() => Math.random() - 0.5);
         setShuffledImages(randomized);
@@ -82,26 +91,20 @@ export default function TestPage() {
     setAnswerResult(isCorrect ? "정답입니다!" : "틀렸습니다.");
     if (isCorrect) setCorrectCount((prev) => prev + 1);
 
-    if (imagePair?.runId) {
-      try {
-        const explanationText = await fetchImageExplanation(imagePair.runId);
-        setExplanation(explanationText);
+    if (imagePair) {
+      setExplanation(imagePair.explanation);
 
-        setResults((prev) => [
-          ...prev,
-          {
-            questionIndex: currentQuestion + 1,
-            realImage: imagePair.real,
-            aiImage: imagePair.ai,
-            selectedType,
-            isCorrect,
-            explanation: explanationText,
-          },
-        ]);
-      } catch (err) {
-        console.error(err);
-        setExplanation("해설을 불러오는 중 오류가 발생했습니다.");
-      }
+      setResults((prev) => [
+        ...prev,
+        {
+          questionIndex: currentQuestion + 1,
+          realImage: imagePair.real,
+          aiImage: imagePair.ai,
+          selectedType,
+          isCorrect,
+          explanation: imagePair.explanation,
+        },
+      ]);
     }
   };
 

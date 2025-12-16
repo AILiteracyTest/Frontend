@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import WhiteCard from "../components/WhiteCard";
-import GrayCard from "../components/GrayCard";
 import Button from "../components/Button";
 import FontToggle from "../components/FontToggle";
+import { Trophy } from "lucide-react";
 
 type QuestionResult = {
   questionIndex: number;
@@ -64,35 +64,45 @@ export default function ResultPage() {
             AI 리터러시 테스트를 완료하셨습니다. 아래에서 전체 결과를
             확인하세요.
           </p>
-          <GrayCard className="font-bold p-6 shadow-md border-b-4 border-gray-300">
-            <p className="font-bold text-gray-800 mb-2">
-              총{" "}
-              <span className="font-extrabold text-2xl">
-                {totalQuestions}개
-              </span>{" "}
-              문항 중{" "}
-              <span className={`text-red-500 text-2xl font-extrabold`}>
-                {correctCount}개
-              </span>{" "}
-              정답!
-            </p>
-          </GrayCard>
-          <div className="flex gap-8 mb-6 mt-6">
-            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex flex-col items-center justify-center">
-              <p className="font-bold text-black mb-2">백분위</p>
-              <p className="text-3xl font-extrabold text-blue-600">
-                {scoreStats ? `${scoreStats.percentile}%` : "-"}
+          <div className="flex gap-8">
+            <div className="w-1/2 max-w-md p-6 flex flex-col items-center justify-center  rounded-2xl border shadow-sm text-center bg-gray-50">
+              <p className="font-bold text-gray-800 mb-0">
+                총{" "}
+                <span className="font-extrabold text-2xl">
+                  {totalQuestions}개
+                </span>{" "}
+                문항 중{" "}
+                <span className={`text-red-500 text-2xl font-extrabold`}>
+                  {correctCount}개
+                </span>{" "}
+                정답!
               </p>
-            </GrayCard>
-
-            <GrayCard className="text-gray-800 h-40 w-1/2 rounded-md flex flex-col items-center justify-center">
-              <p className="font-bold text-black mb-2">전체 순위</p>
-              <p className="text-2xl font-extrabold">
-                {scoreStats
-                  ? `${scoreStats.total}명 중 ${scoreStats.rank}위`
-                  : "-"}
+            </div>
+            <div className="relative w-1/2 h-28 flex flex-col items-center justify-center rounded-2xl border bg-gray-50 shadow-sm">
+              <div className="absolute top-3 right-3 opacity-20 text-blue-900">
+                <Trophy size={20} />
+              </div>
+              <p className="text-xs font-bold text-blue-500 uppercase tracking-wide mb-1 flex items-center gap-1">
+                전체 순위
               </p>
-            </GrayCard>
+              <div className="flex items-baseline">
+                {scoreStats ? (
+                  <>
+                    <span className="text-3xl font-extrabold text-blue-600 font-sans mr-1.5">
+                      {scoreStats.rank}
+                    </span>
+                    <span className="text-lg font-bold text-blue-600 mr-1">
+                      위
+                    </span>
+                    <span className="text-xs text-gray-400 font-medium self-center mt-2">
+                      / {scoreStats.total}명
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-bold text-gray-300">-</span>
+                )}
+              </div>
+            </div>
           </div>
           <h2 className="font-bold text-black mt-12 leading-tight">
             문제별 결과 해설
