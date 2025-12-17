@@ -154,7 +154,7 @@ export default function TestPage() {
               ? [0, 1].map((idx) => (
                   <div
                     key={idx}
-                    className="h-64 w-1/2 rounded-md flex items-center justify-center border-4 border-gray-200"
+                    className="h-96 w-1/2 rounded-md flex items-center justify-center border-4 border-gray-200"
                   >
                     <div className="w-12 h-12 border-4 border-t-primary-blue border-gray-200 rounded-full animate-spin"></div>
                   </div>
@@ -162,7 +162,7 @@ export default function TestPage() {
               : shuffledImages.map((img, idx) => (
                   <div
                     key={idx}
-                    className={`h-64 w-1/2 rounded-md flex items-center justify-center border-4 hover:shadow-lg hover:border-accent-blue cursor-pointer overflow-hidden ${
+                    className={`h-96 w-1/2 rounded-md flex items-center justify-center border-4 hover:shadow-lg hover:border-accent-blue cursor-pointer overflow-hidden ${
                       selectedImage === idx
                         ? "border-accent-blue shadow-lg"
                         : "border-transparent"
