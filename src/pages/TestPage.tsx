@@ -139,7 +139,7 @@ export default function TestPage() {
   return (
     <div className="bg-app-bg flex items-center justify-center min-h-screen p-4 w-screen">
       <FontToggle className="absolute top-4 right-10" />
-      <WhiteCard className="w-full max-w-3xl p-8">
+      <WhiteCard className="w-full max-w-4xl p-8">
         <div className="text-left">
           <p className=" font-semibold text-primary-blue mb-2">
             문제 {currentQuestion + 1}/{totalQuestions}
