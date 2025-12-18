@@ -6,8 +6,10 @@ import { Trophy } from "lucide-react";
 
 type QuestionResult = {
   questionIndex: number;
-  realImage: string;
-  aiImage: string;
+  images: {
+    type: "ai" | "real";
+    url: string;
+  }[];
   selectedType: "ai" | "real";
   isCorrect: boolean;
   explanation: string;
@@ -16,6 +18,7 @@ type QuestionResult = {
 export default function ResultPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const {
     correctCount = 0,
     totalQuestions = 0,
@@ -28,145 +31,103 @@ export default function ResultPage() {
     scoreStats?: {
       rank: number;
       total: number;
-      percentile: number;
     };
   } = location.state || {};
 
   const handleShare = async () => {
-    const mainPageUrl = window.location.origin; // 메인 페이지 URL
+    const url = window.location.origin;
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "AI 리터러시 테스트",
-          text: "이 테스트 해보세요!",
-          url: mainPageUrl,
-        });
-      } catch (err) {
-        console.error("공유 실패:", err);
-      }
+      await navigator.share({
+        title: "AI 리터러시 테스트",
+        text: "AI 이미지 구별 테스트 해보세요!",
+        url,
+      });
     } else {
-      try {
-        console.log("메인 페이지 URL이 복사되었습니다!");
-        await navigator.clipboard.writeText(mainPageUrl);
-      } catch {
-        console.error("복사 실패, 수동으로 공유해주세요.");
-      }
+      await navigator.clipboard.writeText(url);
     }
   };
 
   return (
-    <div className="bg-app-bg flex items-center justify-center min-h-screen p-4 w-screen">
+    <div className="bg-app-bg min-h-screen p-4 w-screen flex justify-center">
       <FontToggle className="absolute top-4 right-10" />
       <WhiteCard>
-        <div className="text-center space-y-8">
-          <h1 className="font-bold mb-4 mt-4 text-black">테스트 결과</h1>
-          <p className="text-gray-600 font-bold">
-            AI 리터러시 테스트를 완료하셨습니다. 아래에서 전체 결과를
-            확인하세요.
-          </p>
+        <div className="space-y-10">
           <div className="flex gap-8">
-            <div className="w-1/2 max-w-md p-6 flex flex-col items-center justify-center  rounded-2xl border shadow-sm text-center bg-gray-50">
-              <p className="font-bold text-gray-800 mb-0">
-                총{" "}
-                <span className="font-extrabold text-2xl">
-                  {totalQuestions}개
-                </span>{" "}
-                문항 중{" "}
-                <span className={`text-red-500 text-2xl font-extrabold`}>
-                  {correctCount}개
-                </span>{" "}
-                정답!
+            <div className="w-1/2 p-6 rounded-2xl border bg-gray-50 text-center">
+              <p className="font-bold text-gray-800">
+                총 <span className="text-2xl">{totalQuestions}</span>문제 중{" "}
+                <span className="text-2xl text-red-500">{correctCount}</span>개
+                정답
               </p>
             </div>
-            <div className="relative w-1/2 h-28 flex flex-col items-center justify-center rounded-2xl border bg-gray-50 shadow-sm">
-              <div className="absolute top-3 right-3 opacity-20 text-blue-900">
-                <Trophy size={20} />
-              </div>
-              <p className="text-xs font-bold text-blue-500 uppercase tracking-wide mb-1 flex items-center gap-1">
-                전체 순위
-              </p>
-              <div className="flex items-baseline">
-                {scoreStats ? (
-                  <>
-                    <span className="text-3xl font-extrabold text-blue-600 font-sans mr-1.5">
-                      {scoreStats.rank}
-                    </span>
-                    <span className="text-lg font-bold text-blue-600 mr-1">
-                      위
-                    </span>
-                    <span className="text-xs text-gray-400 font-medium self-center mt-2">
-                      / {scoreStats.total}명
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-2xl font-bold text-gray-300">-</span>
-                )}
-              </div>
+
+            <div className="relative w-1/2 p-6 rounded-2xl border bg-gray-50 text-center">
+              <Trophy className="absolute top-3 right-3 opacity-20" size={20} />
+              <p className="text-xs font-bold text-blue-500 mb-1">전체 순위</p>
+              {scoreStats ? (
+                <p className="text-3xl font-extrabold text-blue-600">
+                  {scoreStats.rank}위
+                  <span className="text-sm text-gray-400">
+                    {" "}
+                    / {scoreStats.total}명
+                  </span>
+                </p>
+              ) : (
+                <p>-</p>
+              )}
             </div>
           </div>
-          <h2 className="font-bold text-black mt-12 leading-tight">
-            문제별 결과 해설
-          </h2>
-          <div className="mt-6 text-left space-y-10">
-            {results.length === 0 ? (
-              <p className="text-gray-500">저장된 결과가 없습니다.</p>
-            ) : (
-              results.map((item) => (
-                <div
-                  key={item.questionIndex}
-                  className="border rounded-lg p-4 bg-white"
-                >
-                  <p className="font-semibold mb-2 text-black">
-                    문제 {item.questionIndex} ·{" "}
-                    <span
-                      className={
-                        item.isCorrect ? "text-blue-600" : "text-red-600"
-                      }
-                    >
-                      {item.isCorrect ? "정답" : "오답"}
-                    </span>
-                  </p>
 
-                  <div className="flex gap-4 mb-3">
+          <h2 className="font-bold text-black text-lg">문제별 결과 해설</h2>
+
+          {results.map((item) => (
+            <div
+              key={item.questionIndex}
+              className="border p-4 rounded-lg bg-white"
+            >
+              <p className="font-semibold mb-3 text-black">
+                문제 {item.questionIndex} ·{" "}
+                <span
+                  className={item.isCorrect ? "text-blue-600" : "text-red-600"}
+                >
+                  {item.isCorrect ? "정답" : "오답"}
+                </span>
+              </p>
+
+              <div className="flex gap-4 mb-4">
+                {item.images.map((img, idx) => {
+                  const isSelected = img.type === item.selectedType;
+                  const isAnswer = img.type === "ai";
+
+                  return (
                     <div
+                      key={idx}
                       className={`w-1/2 border-2 rounded ${
-                        item.selectedType === "real"
+                        isSelected
                           ? "border-blue-500"
+                          : isAnswer
+                          ? "border-red-500"
                           : "border-gray-200"
                       }`}
                     >
                       <img
-                        src={item.realImage}
-                        alt="real"
-                        className="w-full h-72 object-cover rounded block"
+                        src={img.url}
+                        className="w-full h-64 object-cover rounded"
                       />
                     </div>
+                  );
+                })}
+              </div>
 
-                    <div
-                      className={`w-1/2 border-2 rounded ${
-                        item.selectedType === "ai"
-                          ? "border-blue-500"
-                          : "border-red-500"
-                      }`}
-                    >
-                      <img
-                        src={item.aiImage}
-                        alt="ai"
-                        className="w-full h-72 object-cover rounded block"
-                      />
-                    </div>
-                  </div>
+              <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                {item.explanation}
+              </p>
+            </div>
+          ))}
 
-                  <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-                    {item.explanation}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="flex flex-col gap-3 items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
             <Button onClick={handleShare}>친구에게 공유하기</Button>
-            <Button onClick={() => navigate("/")}>테스트 다시하기</Button>
+            <Button onClick={() => navigate("/")}>다시 하기</Button>
           </div>
         </div>
       </WhiteCard>

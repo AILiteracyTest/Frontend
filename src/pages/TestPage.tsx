@@ -12,8 +12,10 @@ const BASE_URL = "https://aivideocheckservice.onrender.com";
 
 type QuestionResult = {
   questionIndex: number;
-  realImage: string;
-  aiImage: string;
+  images: {
+    type: "ai" | "real";
+    url: string;
+  }[];
   selectedType: "ai" | "real";
   isCorrect: boolean;
   explanation: string;
@@ -98,8 +100,7 @@ export default function TestPage() {
         ...prev,
         {
           questionIndex: currentQuestion + 1,
-          realImage: imagePair.real,
-          aiImage: imagePair.ai,
+          images: shuffledImages,
           selectedType,
           isCorrect,
           explanation: imagePair.explanation,
